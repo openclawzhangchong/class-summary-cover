@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>班级实习材料汇总封面</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: "Microsoft YaHei", "SimSun", sans-serif;
+    background: #525659;
+    padding: 20px;
+  }
+
+  /* ===== 工具栏（打印时隐藏） ===== */
+  .toolbar {
+    max-width: 794px;
+    margin: 0 auto 16px;
+    background: #fff;
+    border-radius: 8px;
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    box-shadow: 0 2px 8px rgba(0,0,0,.3);
+  }
+  .toolbar label { font-size: 14px; color: #333; }
+  .toolbar input, .toolbar select {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 6px 10px;
+    font-size: 14px;
+    width: 150px;
+  }
+  .toolbar input.class-input { width: 150px; display: none; }
+  .btn {
+    border: none;
+    border-radius: 4px;
+    padding: 8px 22px;
+    font-size: 14px;
+    cursor: pointer;
+    margin-left: auto;
+  }
+  .btn-print { background: #1a73e8; color: #fff; }
+  .btn-print:hover { background: #1660c0; }
+  .btn-reset { background: #eee; color: #333; margin-left: 0; }
+  .btn-reset:hover { background: #ddd; }
+  .tip { font-size: 12px; color: #888; width: 100%; }
+
+  /* ===== A4 封面 ===== */
+  .page {
+    width: 794px;          /* A4 宽 210mm @96dpi */
+    min-height: 1123px;    /* A4 高 297mm */
+    margin: 0 auto;
+    background: #fff;
+    box-shadow: 0 4px 16px rgba(0,0,0,.4);
+    padding: 90px 70px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+
+  .title {
+    text-align: center;
+    margin-top: 30px;
+    font-family: "SimHei", "Microsoft YaHei", sans-serif;
+    font-weight: bold;
+  }
+  .title .class-line {
+    font-size: 88px;      /* 班级名为汇总的两倍大小 */
+    letter-spacing: 2px;
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+  .title .summary-line {
+    font-size: 44px;
+    letter-spacing: 10px;
+    margin-top: 18px;
+  }
+
+  .subtitle {
+    text-align: center;
+    font-size: 18px;
+    color: #555;
+    margin-top: 14px;
+    letter-spacing: 4px;
+  }
+
+  .divider {
+    width: 120px;
+    height: 3px;
+    background: #333;
+    margin: 40px auto 0;
+  }
+
+  /* 数据表格 */
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 60px;
+  }
+  .data-table td {
+    border: 2px solid #333;
+    width: 33.33%;
+    text-align: center;
+    padding: 26px 10px;
+    vertical-align: middle;
+  }
+  .item-name {
+    font-size: 19px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    display: block;
+    margin-bottom: 18px;
+  }
+  .item-value {
+    font-size: 42px;
+    font-weight: bold;
+    font-family: "Times New Roman", "SimSun", serif;
+    display: block;
+    line-height: 1;
+  }
+  .item-unit {
+    font-size: 15px;
+    color: #666;
+    display: block;
+    margin-top: 10px;
+  }
+
+  /* 备注区 */
+  .remark-area {
+    margin-top: 46px;
+    font-size: 18px;
+  }
+  .remark-area .remark-label {
+    font-weight: bold;
+    letter-spacing: 2px;
+  }
+  .remark-area .remark-box {
+    margin-top: 14px;
+    min-height: 110px;
+    border: 1.5px solid #333;
+    border-radius: 4px;
+    padding: 14px 16px;
+    font-size: 17px;
+    line-height: 2;
+    text-align: left;
+    color: #222;
+  }
+  .remark-area .remark-box:empty::before {
+    content: "（可填写材料缺失、补交说明等备注信息）";
+    color: #bbb;
+    font-size: 15px;
+  }
+
+  /* 底部签名区 */
+  .footer-area {
+    margin-top: auto;
+    display: flex;
+    justify-content: flex-end;
+    gap: 60px;
+    padding: 0 30px 20px;
+    font-size: 18px;
+  }
+  .footer-area .line {
+    min-width: 170px;
+    border-bottom: 1px solid #333;
+    padding-bottom: 2px;
+    text-align: center;
+  }
+
+  [contenteditable]:focus { outline: 2px dashed #1a73e8; background: #f5f9ff; }
+
+  /* ===== 打印样式：严格单张单面 A4 ===== */
+  @media print {
+    @page { size: A4 portrait; margin: 0; }
+    html, body {
+      width: 210mm;
+      margin: 0;
+      padding: 0;
+      background: #fff;
+      overflow: hidden;
+    }
+    .toolbar { display: none !important; }
+    .page {
+      width: 210mm;
+      height: 296.5mm;        /* 留 0.5mm 余量，防止四舍五入溢出产生第二页 */
+      min-height: auto;
+      box-shadow: none;
+      padding: 28mm 25mm 18mm;
+      overflow: hidden;       /* 超出内容直接裁剪，绝不流出第二页 */
+      page-break-after: avoid;
+      break-after: avoid-page;
+    }
+    .remark-area .remark-box {
+      height: 110px;          /* 备注框锁定高度 */
+      min-height: 0;
+      overflow: hidden;
+    }
+    [contenteditable]:focus { outline: none; background: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- 工具栏 -->
+<div class="toolbar">
+  <label>班级：
+    <select id="classSelect" onchange="onClassSelect()"></select>
+  </label>
+  <input type="text" class="class-input" id="classInput" placeholder="输入班级名称" oninput="syncClass()">
+  <label>班主任：<input type="text" id="teacherInput" placeholder="输入姓名" oninput="syncTeacher()"></label>
+  <label>备注：<input type="text" id="remarkInput" placeholder="输入备注内容" style="width:220px" oninput="syncRemark()"></label>
+  <button class="btn btn-reset" onclick="resetData()">恢复默认数据</button>
+  <button class="btn btn-print" onclick="window.print()">🖨 打印</button>
+  <div class="tip">提示：选择班级后自动带出「班主任」和「班级学籍总人数」，其余数字和备注手动填写；封面上所有内容也可点击直接改。打印时请选择：A4 纸、纵向、边距「无」、单面打印。</div>
+</div>
+
+<!-- A4 封面 -->
+<div class="page" id="cover">
+  <div class="title">
+    <div class="class-line" id="titleClass">24药剂01</div>
+    <div class="summary-line">汇&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;总</div>
+  </div>
+  <div class="subtitle">实 习 材 料 归 档 封 面</div>
+  <div class="divider"></div>
+
+  <table class="data-table">
+    <tr>
+      <td>
+        <span class="item-name">班级学籍总人数</span>
+        <span class="item-value" contenteditable="true">31</span>
+        <span class="item-unit">人</span>
+      </td>
+      <td>
+        <span class="item-name">实习手册确定上交数</span>
+        <span class="item-value" contenteditable="true">30</span>
+        <span class="item-unit">份</span>
+      </td>
+      <td>
+        <span class="item-name">三方协议确定上交合格数</span>
+        <span class="item-value" contenteditable="true">31</span>
+        <span class="item-unit">份</span>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <span class="item-name">三方协议PDF合格人数</span>
+        <span class="item-value" contenteditable="true">31</span>
+        <span class="item-unit">人</span>
+      </td>
+      <td>
+        <span class="item-name">实习情况报备表实际报备人数</span>
+        <span class="item-value" contenteditable="true">31</span>
+        <span class="item-unit">人</span>
+      </td>
+      <td>
+        <span class="item-name">实际走访有效人数</span>
+        <span class="item-value" contenteditable="true">31</span>
+        <span class="item-unit">人</span>
+      </td>
+    </tr>
+  </table>
+
+  <div class="remark-area">
+    <span class="remark-label">备&nbsp;&nbsp;注：</span>
+    <div class="remark-box" id="remarkBox" contenteditable="true"></div>
+  </div>
+
+  <div class="footer-area">
+    <div>班主任：<span class="line" id="teacherLine" contenteditable="true">&nbsp;</span></div>
+    <div>日期：<span class="line" id="dateLine" contenteditable="true">&nbsp;</span></div>
+  </div>
+</div>
+
+<script>
+  const CLASS_LINE_MAX = 654; // A4 内容区可用宽度(px)
+
+  // ===== 班级名册：[班级, 班主任, 学籍人数] =====
+  const CLASSES = [
+    ["24电商01",   "温富英", 44],
+    ["24电商02",   "林晓红", 31],
+    ["24电商03",   "叶琪珑", 26],
+    ["24动画01",   "徐梁生", 48],
+    ["24动画02",   "郑海滨", 26],
+    ["24动画03",   "马晓宗", 23],
+    ["24护理01",   "蔡媛钗", 57],
+    ["24护理02",   "周淑娟", 33],
+    ["24计应01",   "林晓玲", 45],
+    ["24计应02",   "叶琪珑", 17],
+    ["24计应03",   "马晓宗", 10],
+    ["24口腔01",   "林晓红", 40],
+    ["24美妆01",   "翁颖颖", 47],
+    ["24农管01",   "郑明慧", 11],
+    ["24烹饪01",   "江寒艳", 26],
+    ["24新能源01", "陈武",   46],
+    ["24新能源02", "吴荔君", 43],
+    ["24药剂01",   "倪梅清", 47],
+    ["24药剂02",   "林晓红", 29],
+    ["24幼教01",   "郑明慧", 13]
+  ];
+
+  // 初始化下拉
+  (function initSelect() {
+    const sel = document.getElementById("classSelect");
+    CLASSES.forEach(c => {
+      const opt = document.createElement("option");
+      opt.value = c[0];
+      opt.textContent = c[0];
+      sel.appendChild(opt);
+    });
+    const custom = document.createElement("option");
+    custom.value = "__custom__";
+    custom.textContent = "自定义…";
+    sel.appendChild(custom);
+  })();
+
+  function findClass(name) {
+    return CLASSES.find(c => c[0] === name);
+  }
+
+  // 应用某个班级：班级名 + 班主任 + 学籍人数
+  function applyClass(name) {
+    syncClass(name);
+    const rec = findClass(name);
+    const teacherInput = document.getElementById("teacherInput");
+    const values = document.querySelectorAll(".item-value");
+    if (rec) {
+      teacherInput.value = rec[1];
+      document.getElementById("teacherLine").textContent = rec[1];
+      values[0].textContent = rec[2];           // 学籍人数
+    } else {
+      teacherInput.value = "";
+      document.getElementById("teacherLine").textContent = "\u00a0";
+      values[0].textContent = "";
+    }
+    // 其余五项清空待填
+    for (let i = 1; i < values.length; i++) values[i].textContent = "";
+  }
+
+  // 班级下拉选择
+  function onClassSelect() {
+    const sel = document.getElementById("classSelect");
+    const input = document.getElementById("classInput");
+    if (sel.value === "__custom__") {
+      input.style.display = "inline-block";
+      input.focus();
+      applyClass(input.value.trim());
+    } else {
+      input.style.display = "none";
+      input.value = "";
+      applyClass(sel.value);
+    }
+  }
+
+  // 班级名称同步（自动缩小过长班名）
+  function syncClass(name) {
+    const el = document.getElementById("titleClass");
+    el.textContent = name || "____";
+    el.style.fontSize = "88px";
+    // 超宽自动缩小字号
+    let size = 88;
+    while (el.scrollWidth > CLASS_LINE_MAX && size > 40) {
+      size -= 4;
+      el.style.fontSize = size + "px";
+    }
+    document.title = name + " 汇总封面";
+  }
+
+  // 班主任同步
+  function syncTeacher() {
+    const v = document.getElementById("teacherInput").value.trim();
+    document.getElementById("teacherLine").textContent = v || "\u00a0";
+  }
+
+  // 备注同步
+  function syncRemark() {
+    document.getElementById("remarkBox").textContent = document.getElementById("remarkInput").value;
+  }
+
+  // 日期默认填充当天
+  function fillToday() {
+    const d = new Date();
+    document.getElementById("dateLine").innerHTML =
+      d.getFullYear() + "&nbsp;年&nbsp;" + (d.getMonth() + 1) + "&nbsp;月&nbsp;" + d.getDate() + "&nbsp;日";
+  }
+
+  // 恢复默认数据（按当前选中班级重新应用名册）
+  function resetData() {
+    if (!confirm("确定要恢复默认数据吗？当前手动修改的内容将丢失。")) return;
+    const sel = document.getElementById("classSelect");
+    const input = document.getElementById("classInput");
+    input.value = "";
+    input.style.display = "none";
+    sel.value = sel.options[0].value;
+    applyClass(sel.value);
+    document.getElementById("remarkInput").value = "";
+    document.getElementById("remarkBox").textContent = "";
+    fillToday();
+    document.querySelectorAll(".footer-area .line")[1].innerHTML = "2026&nbsp;年&nbsp;&nbsp;&nbsp;月&nbsp;&nbsp;&nbsp;日";
+  }
+
+  // 页面载入：默认应用第一个班级（24电商01），日期填当天
+  applyClass(document.getElementById("classSelect").value);
+  fillToday();
+</script>
+
+</body>
+</html>
